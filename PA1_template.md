@@ -6,11 +6,10 @@ output:
 ---
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 ## Loading and preprocessing the data
-```{r data}
+
+```r
 if (!file.exists("activity.csv") ) {
         unzip("activity.zip")
 }
@@ -19,24 +18,51 @@ main_data <- na.omit(raw_data)
 head(main_data)
 ```
 
+```
+##     steps       date interval
+## 289     0 2012-10-02        0
+## 290     0 2012-10-02        5
+## 291     0 2012-10-02       10
+## 292     0 2012-10-02       15
+## 293     0 2012-10-02       20
+## 294     0 2012-10-02       25
+```
+
 
 ## What is mean total number of steps taken per day?
-```{r question2}
+
+```r
 steps_per_day <- aggregate(main_data$steps, by = list(Steps.Date = main_data$date), FUN = "sum")
 hist(steps_per_day$x, col = "green", 
      breaks = 20,
      main = "Total number of steps taken each day",
      xlab = "Number of steps per day")
+```
+
+![](PA1_template_files/figure-html/question2-1.png)<!-- -->
+
+```r
 mean_steps <- mean(steps_per_day[,2])
 print (mean_steps)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 median_steps <- median(steps_per_day[,2])
 print (median_steps)
 ```
 
+```
+## [1] 10765
+```
+
 
 ## What is the average daily activity pattern?
-```{r question3}
+
+```r
 avaraged_day <- aggregate(main_data$steps, 
                           by = list(Interval = main_data$interval), 
                           FUN = "mean")
@@ -44,18 +70,64 @@ plot(avaraged_day$Interval, avaraged_day$x, type = "l",
      main = "Average daily activity pattern", 
      ylab = "Avarage number of steps taken", 
      xlab = "5-min intervals")
+```
+
+![](PA1_template_files/figure-html/question3-1.png)<!-- -->
+
+```r
 interval_row <- which.max(avaraged_day$x)
 max_interval <- avaraged_day[interval_row,1]
 print (max_interval)
+```
 
+```
+## [1] 835
 ```
 
 
 ## Imputing missing values
-```{r question 4}
+
+```r
 NA_number <- length(which(is.na(raw_data$steps)))
 print (NA_number)
+```
+
+```
+## [1] 2304
+```
+
+```r
 library(Hmisc)
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: survival
+```
+
+```
+## Loading required package: Formula
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```
+## 
+## Attaching package: 'Hmisc'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, units
+```
+
+```r
 raw_data_filled <- raw_data
 raw_data_filled$steps <- impute(raw_data$steps, fun=mean)
 
@@ -66,17 +138,32 @@ hist(steps_per_day_noNA$x, col = "green",
      breaks = 20,
      main = "Total number of steps taken each day (filled data)",
      xlab = "Number of steps per day")
+```
 
+![](PA1_template_files/figure-html/question 4-1.png)<!-- -->
+
+```r
 mean_steps_noNA <- mean(steps_per_day_noNA[,2])
 print (mean_steps_noNA)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 median_steps_noNA <- median(steps_per_day_noNA[,2])
 print (median_steps_noNA)
 ```
 
+```
+## [1] 10766.19
+```
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r ques}
+
+```r
 raw_data_filled$date <- as.Date(raw_data_filled$date)
 raw_data_filled$weekday <- weekdays(raw_data_filled$date)
 raw_data_filled$day_type <- ifelse(raw_data_filled$weekday=="??????????????" |
@@ -93,3 +180,5 @@ ggplot(day_types_data, aes(interval, steps)) +
         ylab("Avarage number of steps taken") +
         ggtitle("Weekdays and weekends activity patterns")
 ```
+
+![](PA1_template_files/figure-html/ques-1.png)<!-- -->
